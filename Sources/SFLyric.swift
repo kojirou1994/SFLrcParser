@@ -8,15 +8,15 @@
 
 import Foundation
 
-enum SFLyricError: Error {
+public enum SFLyricError: Error {
     case timeSyntaxError
 }
 
-struct SFLyric {
-    var time: Int
-    var text: String
+public struct SFLyric {
+    public var time: Int
+    public var text: String
     
-    init(time: String, text: String) throws {
+    public init(time: String, text: String) throws {
         let time = time.substring(from: time.index(time.startIndex, offsetBy: 1))
         guard let minute = Int(time.substring(to: time.index(time.startIndex, offsetBy: 2))),
             let second = Int(time[time.index(time.startIndex, offsetBy: 3)..<time.index(time.startIndex, offsetBy: 5)]),

@@ -8,35 +8,33 @@
 
 import Foundation
 
-struct SFLrcParser {
+public struct SFLrcParser {
     let lyric: String
     
-    init(rawLyric: String) {
-//        var lyric = rawLyric
-//        while let range = lyric.range(of: "\n") {
-//            lyric.removeSubrange(range)
-//        }
+    public init(rawLyric: String) {
         self.lyric = rawLyric
     }
     
-    func parse() -> [SFLyric] {
+    public func parse() -> SFLrc {
         let lines = lyric.components(separatedBy: "\n").filter { $0.characters.count > 0 && $0.hasPrefix("[") && $0.contains("]")}
         var lyrics = [SFLyric]()
         lines.forEach({ line in
-            let comp = line.components(separatedBy: "]")
-            let time = comp[0]
-            let text = comp.count > 1 ? comp[1] : ""
-            if time.characters.count == 9 && time[time.index(time.startIndex, offsetBy: 3)] == ":" && time[time.index(time.startIndex, offsetBy: 6)] == "." {
+            let separateIndex = line.range(of: "]")!.lowerBound
+            let tag = line.substring(to: separateIndex)
+            let text = line.substring(from: line.index(separateIndex, offsetBy: 1))
+            if tag.characters.count == 9 || tag.characters.count == 10 && tag[tag.index(tag.startIndex, offsetBy: 3)] == ":" && tag[tag.index(tag.startIndex, offsetBy: 6)] == "." {
                 do {
-                    let lyric = try SFLyric(time: time, text: text)
+                    let lyric = try SFLyric(time: tag, text: text)
                     lyrics.append(lyric)
                 } catch {
                     return
                 }
+            } else {
+                // Lrc tag info handling
             }
         })
         lyrics.sort{ $0 < $1 }
-        return lyrics
+        return SFLrc(lyrics: lyrics)
     }
 }
 
